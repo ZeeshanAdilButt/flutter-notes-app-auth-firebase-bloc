@@ -20,26 +20,33 @@ class NotesListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      padding: const EdgeInsets.all(16),
       itemCount: notes.length,
       itemBuilder: (context, index) {
         final note = notes.elementAt(index);
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          margin: const EdgeInsets.only(bottom: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 2,
+          elevation: 3,
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 20,
+            ),
             onTap: () {
               onTap(note);
             },
             title: Text(
               note.text,
-              maxLines: 1,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.5,
                   ),
             ),
             trailing: IconButton(

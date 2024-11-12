@@ -92,9 +92,17 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black87),
         title: Text(
           context.loc.note,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
         ),
         actions: [
           IconButton(
@@ -106,7 +114,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 Share.share(text);
               }
             },
-            icon: const Icon(Icons.share),
+            icon: Icon(
+              Icons.share,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),
@@ -116,16 +127,51 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               _setupTextControllerListener();
-              return TextField(
-                controller: _textController,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: InputDecoration(
-                  hintText: context.loc.start_typing_your_note,
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _textController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: context.loc.start_typing_your_note,
+                      hintStyle: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 18,
+                      ),
+                      border: InputBorder.none, // Removes default border
+                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 18,
+                          color: Colors.black87,
+                          height: 1.5, // Adds line height for readability
+                        ),
+                    textAlignVertical: TextAlignVertical.top,
+                    autofocus: true,
+                  ),
                 ),
               );
             default:
-              return const CircularProgressIndicator();
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
           }
         },
       ),
