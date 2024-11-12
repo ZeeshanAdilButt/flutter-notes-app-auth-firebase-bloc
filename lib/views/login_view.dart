@@ -160,42 +160,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              context.read<AuthBloc>().add(
-                                const AuthEventForgotPassword(),
-                              );
-                            },
-                            child: Text(
-                              'Forgot password?',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              context.read<AuthBloc>().add(
-                                const AuthEventShouldRegister(),
-                              );
-                            },
-                            child: Text(
-                              'Create an account',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                   
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
@@ -215,6 +180,44 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     const SizedBox(height: 24),
+                     Align(
+                      alignment: AlignmentDirectional.center,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              context.read<AuthBloc>().add(
+                                const AuthEventForgotPassword(),
+                              );
+                            },
+                            child: Text(
+                              'Forgot password?',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              context.read<AuthBloc>().add(
+                                const AuthEventShouldRegister(),
+                              );
+                            },
+                            child: Text(
+                              'Create an account',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),

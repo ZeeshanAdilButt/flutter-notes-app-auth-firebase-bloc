@@ -1,111 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:mynotes2/constants/routes.dart';
-import 'package:mynotes2/enums/menu_action.dart';
-import 'package:mynotes2/extensions/buildcontext/loc.dart';
-import 'package:mynotes2/services/auth/auth_service.dart';
-import 'package:mynotes2/services/auth/bloc/auth_bloc.dart';
-import 'package:mynotes2/services/auth/bloc/auth_event.dart';
 import 'package:mynotes2/services/cloud/cloud_note.dart';
-import 'package:mynotes2/services/cloud/firebase_cloud_storage.dart';
-import 'package:mynotes2/utilities/dialogs/logout_dialog.dart';
-import 'package:mynotes2/views/notes/notes_list_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
+import 'package:mynotes2/utilities/dialogs/delete_dialog.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-extension Count<T extends Iterable> on Stream<T> {
-  Stream<int> get getLength => map((event) => event.length);
-}
+typedef NoteCallback = void Function(CloudNote note);
 
-class NotesView extends StatefulWidget {
-  const NotesView({Key? key}) : super(key: key);
+class NotesListView extends StatelessWidget {
+  final Iterable<CloudNote> notes;
+  final NoteCallback onDeleteNote;
+  final NoteCallback onTap;
 
-  @override
-  _NotesViewState createState() => _NotesViewState();
-}
-
-class _NotesViewState extends State<NotesView> {
-  late final FirebaseCloudStorage _notesService;
-  String get userId => AuthService.firebase().currentUser!.id;
-
-  @override
-  void initState() {
-    _notesService = FirebaseCloudStorage();
-    super.initState();
-  }
+  const NotesListView({
+    Key? key,
+    required this.notes,
+    required this.onDeleteNote,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: StreamBuilder(
-          stream: _notesService.allNotes(ownerUserId: userId).getLength,
-          builder: (context, AsyncSnapshot<int> snapshot) {
-            if (snapshot.hasData) {
-              final noteCount = snapshot.data ?? 0;
-              final text = context.loc.notes_title(noteCount);
-              return Text(text);
-            } else {
-              return const Text('');
-            }
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
-            },
-            icon: const Icon(Icons.add),
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: notes.length,
+      itemBuilder: (context, index) {
+        final note = notes.elementAt(index);
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          PopupMenuButton<MenuAction>(
-            onSelected: (value) async {
-              switch (value) {
-                case MenuAction.logout:
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
-                        );
-                  }
-              }
+          elevation: 4,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 24,
+            ),
+            onTap: () {
+              onTap(note);
             },
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem<MenuAction>(
-                  value: MenuAction.logout,
-                  child: Text(context.loc.logout_button),
-                ),
-              ];
-            },
-          )
-        ],
-      ),
-      body: StreamBuilder(
-        stream: _notesService.allNotes(ownerUserId: userId),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              if (snapshot.hasData) {
-                final allNotes = snapshot.data as Iterable<CloudNote>;
-                return NotesListView(
-                  notes: allNotes,
-                  onDeleteNote: (note) async {
-                    await _notesService.deleteNote(documentId: note.documentId);
-                  },
-                  onTap: (note) {
-                    Navigator.of(context).pushNamed(
-                      createOrUpdateNoteRoute,
-                      arguments: note,
-                    );
-                  },
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            default:
-              return const CircularProgressIndicator();
-          }
-        },
-      ),
+            title: Text(
+              note.text,
+              maxLines: 6,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+            trailing: IconButton(
+              onPressed: () async {
+                final shouldDelete = await showDeleteDialog(context);
+                if (shouldDelete) {
+                  onDeleteNote(note);
+                }
+              },
+              icon: Icon(
+                LucideIcons.trash,
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

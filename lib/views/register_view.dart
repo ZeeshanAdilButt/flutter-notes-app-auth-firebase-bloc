@@ -6,6 +6,7 @@ import 'package:mynotes2/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes2/services/auth/bloc/auth_event.dart';
 import 'package:mynotes2/services/auth/bloc/auth_state.dart';
 import 'package:mynotes2/utilities/dialogs/error_dialog.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -17,6 +18,7 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool _isPasswordVisible = false;
 
   @override
   void initState() {
@@ -61,54 +63,119 @@ class _RegisterViewState extends State<RegisterView> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(context.loc.register),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(context.loc.register_view_prompt),
-                TextField(
-                  controller: _email,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  autofocus: true,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: context.loc.email_text_field_placeholder,
-                  ),
-                ),
-                TextField(
-                  controller: _password,
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    hintText: context.loc.password_text_field_placeholder,
-                  ),
-                ),
-                Center(
-                  child: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () async {
-                          final email = _email.text;
-                          final password = _password.text;
-                          context.read<AuthBloc>().add(
-                                AuthEventRegister(
-                                  email,
-                                  password,
-                                ),
-                              );
-                        },
-                        child: Text(
-                          context.loc.register,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 48),
+                    Text(
+                      context.loc.register,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      context.loc.register_view_prompt,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 48),
+                    TextField(
+                      controller: _email,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: context.loc.email_text_field_placeholder,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.mail,
+                          color: Colors.grey[600],
                         ),
                       ),
-                      TextButton(
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _password,
+                      obscureText: !_isPasswordVisible,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        labelText: context.loc.password_text_field_placeholder,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.lock,
+                          color: Colors.grey[600],
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final email = _email.text;
+                        final password = _password.text;
+                        context.read<AuthBloc>().add(
+                              AuthEventRegister(
+                                email,
+                                password,
+                              ),
+                            );
+                      },
+                      child: Text(context.loc.register),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: TextButton(
                         onPressed: () {
                           context.read<AuthBloc>().add(
                                 const AuthEventLogOut(),
@@ -116,12 +183,17 @@ class _RegisterViewState extends State<RegisterView> {
                         },
                         child: Text(
                           context.loc.register_view_already_registered,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
